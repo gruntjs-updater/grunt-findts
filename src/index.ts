@@ -1,0 +1,2 @@
+﻿var n = {};
+export = n;

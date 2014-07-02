@@ -1,0 +1,49 @@
+{
+  "name": "grunt-findts",
+  "description": "Find TypeScript type definitions for dependencies",
+  "version": "0.1.0",
+  "keywords": [
+    "gruntplugin"
+  ],
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/yortus/grunt-findts.git"
+  },
+  "bugs": {
+    "url": "http://github.com/yortus/grunt-findts/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Troy Gerwien",
+    "email": "yortus@gmail.com",
+    "url": "http://github.com/yortus/"
+  },
+  "readmeFilename": "README.md",
+  "scripts": {
+    "test": "grunt test",
+    "prepublish": "grunt build"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "grunt-contrib-nodeunit": "^0.4.1",
+    "bluebird": "~2.1.3",
+    "asyncawait": "~0.7.2",
+    "lodash": "~2.4.1",
+    "fs-tools": "~0.2.11"
+  },
+  "devDependencies": {
+    "mocha": "~1.18.2",
+    "chai": "~1.9.1",
+    "grunt": "~0.4.5",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-mocha-test": "~0.10.2",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-typescript": "~0.3.6"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  }
+}
