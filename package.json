@@ -3,7 +3,9 @@
   "description": "Find TypeScript type definitions for dependencies",
   "version": "0.1.0",
   "keywords": [
-    "gruntplugin"
+    "gruntplugin",
+    "typescript",
+    "tsd"
   ],
   "main": "src/index.js",
   "repository": {
