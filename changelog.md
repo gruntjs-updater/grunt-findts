@@ -1,7 +1,8 @@
-# 0.0.1 (2014-06-27)
+# 0.1.1 (2014-07-03)
 
-#### Bug Fixes
+- Removed dead code & files (tests to be added back later)
 
-#### New Features
+# 0.1.0 (2014-06-27)
 
-#### Improvements
+- Initial version
+

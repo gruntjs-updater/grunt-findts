@@ -42,7 +42,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="tests\findts_test.js" />
     <Content Include=".gitignore" />
     <Content Include=".npmignore" />
     <Content Include="changelog.md" />
@@ -50,37 +49,21 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Compile Include="Gruntfile.js" />
-    <Content Include="tests\expected\custom_options" />
-    <Content Include="tests\expected\default_options" />
-    <Content Include="tests\fixtures\123" />
-    <Content Include="tests\fixtures\testing" />
-    <Content Include="tsd.json" />
     <Content Include="typings\asyncawait\asyncawait.d.ts" />
     <Content Include="typings\bluebird\bluebird.d.ts" />
-    <Content Include="typings\chai\chai.d.ts" />
     <Content Include="typings\lodash\lodash.d.ts" />
-    <Content Include="typings\mocha\mocha.d.ts" />
     <Content Include="typings\node\node.d.ts" />
-    <Content Include="typings\tsd.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="module.d.ts" />
-    <TypeScriptCompile Include="src\index.ts" />
     <TypeScriptCompile Include="references.d.ts" />
     <TypeScriptCompile Include="tasks\findts.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="tasks\" />
-    <Folder Include="src\" />
-    <Folder Include="tests\" />
-    <Folder Include="tests\expected\" />
-    <Folder Include="tests\fixtures\" />
     <Folder Include="typings\" />
     <Folder Include="typings\asyncawait\" />
     <Folder Include="typings\bluebird\" />
-    <Folder Include="typings\chai\" />
     <Folder Include="typings\lodash\" />
-    <Folder Include="typings\mocha\" />
     <Folder Include="typings\node\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
