@@ -29,7 +29,7 @@ var taskInner = async ((log: (msg: string) => void) => {
     var pkg = require(pkgPath);
 
     // Get the names of all the module's direct dependencies, and add them to the 'pending' queue.
-    var pending = <string[]> _.keys(_.assign({}, pkg.dependencies, pkg.peerDependencies, pkg.devDependencies));
+    var pending = <string[]> _.keys(_.assign({}, pkg.dependencies, pkg.peerDependencies, pkg.devDependencies, pkg.optionalDependencies));
 
     // Keep track of already-handled dependencies, and ones for which type definitions were found.
     var handled = [], located = [];

@@ -24,23 +24,29 @@ var task = function (grunt) {
 };
 
 var taskInner = async(function (log) {
+    // Assume the current working directory is that of the module we are working it.
     var basePath = process.cwd();
     var pkgPath = path.join(basePath, 'package.json');
     var pkg = require(pkgPath);
 
-    var pending = _.keys(_.assign({}, pkg.dependencies, pkg.peerDependencies, pkg.devDependencies));
+    // Get the names of all the module's direct dependencies, and add them to the 'pending' queue.
+    var pending = _.keys(_.assign({}, pkg.dependencies, pkg.peerDependencies, pkg.devDependencies, pkg.optionalDependencies));
 
+    // Keep track of already-handled dependencies, and ones for which type definitions were found.
     var handled = [], located = [];
 
     while (pending.length > 0) {
         var depName = pending.shift();
 
+        // Update the handled list, and skip this dependency if it was already handled.
         if (handled.indexOf(depName) !== -1)
             continue;
         handled.push(depName);
 
+        // Give feedback.
         log('Finding type definition for ' + depName + '...');
 
+        // Determine the module location that the dependency will resolve to, if possible.
         var searchPath = basePath;
         while (true) {
             var depPath = path.join(searchPath, 'node_modules', depName);
@@ -52,7 +58,12 @@ var taskInner = async(function (log) {
             searchPath = newSearchPath;
         }
 
+        // If the module's location is found, look for its type definition there.
         if (fs.existsSync(depPath)) {
+            // Determine where to look for the type definition file. If the module's package.json
+            // has a 'typescript' key, use the associated value as the relative path to the file.
+            // Otherwise, use the canonical module-relative path of './typings/<modname>/<modname>.d.ts'.
+            // Otherwise, try the module-relative paths of './<modname>.d.ts', then './module.d.ts'.
             var pkgPath = path.join(depPath, 'package.json');
             var pkg = require(pkgPath);
             var srcRelPaths = [
@@ -64,17 +75,21 @@ var taskInner = async(function (log) {
                 return path.join(depPath, rel);
             }), fs.existsSync);
 
+            // If the type definition file exists at the target location, continue processing it.
             if (srcPath) {
                 located.push(depName);
 
+                // Give feedback.
                 log('...found at ' + srcPath);
 
+                // Copy the file to the canonical location of our module. Overwrite anything already there.
                 var tgtPath = path.join(basePath, 'typings', depName);
                 fsTools.mkdirSync(tgtPath);
                 tgtPath = path.join(tgtPath, depName + '.d.ts');
                 var content = fs.readFileSync(srcPath, { encoding: 'utf8' });
                 fs.writeFileSync(tgtPath, content, { encoding: 'utf8' });
 
+                // Find other canonical module references within the file, and add them to the pending list.
                 var pattern = /^\/\/\/<reference[ ]+path[ ]*=[ ]*['"]..[/\\][^\/]*[/\\][^.]*[.]d[.]ts['"][ ]*\/>$/gm;
                 var refLines = content.match(pattern) || [];
                 var refNames = refLines.map(function (refLine) {
@@ -84,7 +99,9 @@ var taskInner = async(function (log) {
             }
         }
 
+        // If the type definition wasn't found locally, look for one on Github/DefinitelyTyped.
         if (!_.contains(located, depName)) {
+            // Attempt to get the file over HTTPS from Github/DefinitelyTyped.
             var urlTemplate = 'https://raw.githubusercontent.com/borisyankov/DefinitelyTyped/master/{1}/{2}.d.ts';
             var url = urlTemplate.replace('{1}', depName).replace('{2}', depName);
             try  {
@@ -93,16 +110,21 @@ var taskInner = async(function (log) {
                 content = null;
             }
 
+            // If the type definition file exists at the target url, continue processing it.
             if (content) {
                 located.push(depName);
 
+                // Give feedback.
                 log('...found at ' + url);
 
+                //TODO: address code duplication of next two paras with 'local' case above
+                // Create the file at the canonical location of our module. Overwrite anything already there.
                 var tgtPath = path.join(basePath, 'typings', depName);
                 fsTools.mkdirSync(tgtPath);
                 tgtPath = path.join(tgtPath, depName + '.d.ts');
                 fs.writeFileSync(tgtPath, content, { encoding: 'utf8' });
 
+                // Find other canonical module references within the file, and add them to the pending list.
                 var pattern = /^\/\/\/<reference[ ]+path[ ]*=[ ]*['"]..[/\\][^\/]*[/\\][^.]*[.]d[.]ts['"][ ]*\/>$/gm;
                 var refLines = content.match(pattern) || [];
                 var refNames = refLines.map(function (refLine) {
@@ -112,11 +134,13 @@ var taskInner = async(function (log) {
             }
         }
 
+        // Give feedback.
         if (!_.contains(located, depName)) {
             log('...NOTHING FOUND');
         }
     }
 
+    // Generate the new reference section of our module's references.d.ts file.
     var prolog = '/*----------findts----------*/';
     var epilog = '/*----------/findts----------*/';
     var section = prolog + EOL + '/* NB: This section is generated and maintained by grunt-findts. */' + EOL + '/* NB: Any manual changes here will be overwritten whenever grunt-findts runs. */' + EOL;
@@ -125,6 +149,7 @@ var taskInner = async(function (log) {
     });
     section += epilog;
 
+    // Parse the current references.d.ts, if any.
     var refPath = path.join(basePath, 'references.d.ts');
     var content = fs.existsSync(refPath) ? fs.readFileSync(refPath, { encoding: 'utf8' }) : '';
     var start = content.indexOf(prolog), end = content.indexOf(epilog);
@@ -138,9 +163,11 @@ var taskInner = async(function (log) {
     } else
         throw new Error('Invalid references.d.ts');
 
+    // Write back the updated references.d.ts with the new section spliced in.
     fs.writeFileSync(refPath, pre + section + post, { encoding: 'utf8' });
 });
 
+/** Promise-returning helper method to fetch a resource over HTTPS. */
 function httpsGet(url) {
     return new Promise(function (resolve, reject) {
         var chunks = [];
