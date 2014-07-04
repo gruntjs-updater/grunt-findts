@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                     module: 'commonjs',
                     sourceMap: true,
                     declaration: false,
-                    removeComments: false
+                    comments: true
                 }
             }
         }
