@@ -32,6 +32,9 @@ var taskInner = async(function (log) {
     // Get the names of all the module's direct dependencies, and add them to the 'pending' queue.
     var pending = _.keys(_.assign({}, pkg.dependencies, pkg.peerDependencies, pkg.devDependencies, pkg.optionalDependencies));
 
+    // Always add 'node' as an implicit dependency.
+    pending.unshift('node');
+
     // Keep track of already-handled dependencies, and ones for which type definitions were found.
     var handled = [], located = [];
 
